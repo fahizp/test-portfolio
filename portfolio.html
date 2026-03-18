@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fahiz — Electronics Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS Variables ===== */
+    :root {
+      --navy:       #070d1a;
+      --navy-mid:   #0d1b2e;
+      --navy-card:  #0f2040;
+      --navy-border:#162a47;
+      --blue:       #0ea5e9;
+      --blue-glow:  #38bdf8;
+      --blue-dim:   #0369a1;
+      --cyan:       #22d3ee;
+      --white:      #f0f6ff;
+      --muted:      #7a9ab8;
+      --tag-bg:     #0a1e38;
+      --radius:     10px;
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-mono:  'Space Mono', monospace;
+      --font-body:  'DM Sans', sans-serif;
+    }
+
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ===== Circuit Background Canvas ===== */
+    #circuit-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    /* ===== Nav ===== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 5%;
+      background: rgba(7, 13, 26, 0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(14, 165, 233, 0.12);
+      transition: box-shadow var(--transition);
+    }
+    nav.scrolled {
+      box-shadow: 0 4px 40px rgba(14, 165, 233, 0.08);
+    }
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      color: var(--blue);
+      letter-spacing: 0.04em;
+    }
+    .nav-logo span { color: var(--white); }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+      transition: color var(--transition);
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0;
+      width: 0; height: 1.5px;
+      background: var(--blue);
+      transition: width var(--transition);
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--blue);
+      border-radius: 2px;
+      transition: var(--transition);
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 61px; left: 0; right: 0;
+      background: rgba(7, 13, 26, 0.97);
+      border-bottom: 1px solid var(--navy-border);
+      padding: 1.5rem 5%;
+      z-index: 99;
+    }
+    .mobile-menu.open { display: block; }
+    .mobile-menu a {
+      display: block;
+      padding: 0.75rem 0;
+      font-size: 1rem;
+      color: var(--muted);
+      border-bottom: 1px solid var(--navy-border);
+      transition: color var(--transition);
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { color: var(--blue); }
+
+    /* ===== Section Wrapper ===== */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 5%;
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--blue);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+    .section-divider {
+      width: 48px; height: 2px;
+      background: linear-gradient(90deg, var(--blue), transparent);
+      margin-bottom: 3rem;
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ===== Hero ===== */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 5rem;
+      max-width: 100%;
+      padding-left: 5%;
+      padding-right: 5%;
+    }
+    .hero-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--blue);
+      letter-spacing: 0.12em;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px; height: 1px;
+      background: var(--blue);
+    }
+    .hero-name {
+      font-family: var(--font-mono);
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+    .hero-name .highlight {
+      color: var(--blue);
+      position: relative;
+    }
+    .hero-title {
+      font-family: var(--font-mono);
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--muted);
+      margin-top: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .hero-tagline {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: #aac4df;
+      max-width: 540px;
+      line-height: 1.75;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      padding: 0.85rem 2rem;
+      background: var(--blue);
+      color: var(--navy);
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary:hover {
+      background: var(--blue-glow);
+      box-shadow: 0 0 28px rgba(14, 165, 233, 0.45);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--blue);
+      border: 1.5px solid var(--blue);
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+      cursor: pointer;
+    }
+    .btn-outline:hover {
+      background: rgba(14, 165, 233, 0.08);
+      box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);
+      transform: translateY(-2px);
+    }
+    .hero-scroll {
+      margin-top: 4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, var(--blue), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    /* ===== About ===== */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .about-photo-wrap {
+      position: relative;
+    }
+    .about-photo {
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--navy-card);
+      border-radius: 12px;
+      border: 1.5px solid var(--navy-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .about-photo::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(14,165,233,0.08) 0%, transparent 60%);
+    }
+    .photo-icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-dim), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .photo-icon svg { width: 36px; height: 36px; fill: white; }
+    .about-photo-frame {
+      position: absolute;
+      top: -8px; left: -8px;
+      width: 100px; height: 100px;
+      border-top: 2px solid var(--blue);
+      border-left: 2px solid var(--blue);
+      border-radius: 4px 0 0 0;
+      pointer-events: none;
+    }
+    .about-photo-frame-br {
+      position: absolute;
+      bottom: -8px; right: -8px;
+      width: 100px; height: 100px;
+      border-bottom: 2px solid var(--blue);
+      border-right: 2px solid var(--blue);
+      border-radius: 0 0 4px 0;
+      pointer-events: none;
+    }
+    .about-bio {
+      font-size: 1.02rem;
+      color: #aac4df;
+      line-height: 1.85;
+      margin-bottom: 1.75rem;
+      font-weight: 300;
+    }
+    .about-bio strong { color: var(--white); font-weight: 600; }
+    .about-traits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .trait-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.9rem;
+      background: var(--tag-bg);
+      border: 1px solid var(--navy-border);
+      border-radius: 100px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .trait-chip:hover { border-color: var(--blue); color: var(--blue); }
+    .trait-chip::before { content: '▹'; color: var(--blue); }
+
+    /* ===== Skills ===== */
+    #skills { background: transparent; }
+    .skills-wrap { display: flex; flex-direction: column; gap: 2.5rem; }
+    .skill-category-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--blue);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .skill-tag {
+      padding: 0.45rem 1rem;
+      background: var(--tag-bg);
+      border: 1px solid var(--navy-border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      color: var(--muted);
+      transition: all var(--transition);
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-tag::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(14,165,233,0.06), transparent);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .skill-tag:hover {
+      border-color: var(--blue);
+      color: var(--white);
+      box-shadow: 0 0 14px rgba(14, 165, 233, 0.2);
+      transform: translateY(-2px);
+    }
+    .skill-tag:hover::before { opacity: 1; }
+
+    /* Progress bars variant for tools */
+    .skill-bars { display: flex; flex-direction: column; gap: 1.1rem; }
+    .skill-bar-item {}
+    .skill-bar-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.45rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+    .skill-bar-header span:last-child { color: var(--blue); }
+    .skill-bar-track {
+      height: 4px;
+      background: var(--navy-border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .skill-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue-dim), var(--blue));
+      border-radius: 4px;
+      width: 0%;
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 8px rgba(14, 165, 233, 0.5);
+    }
+
+    /* ===== Projects ===== */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .project-card {
+      background: var(--navy-card);
+      border: 1px solid var(--navy-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--blue), transparent);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .project-card:hover {
+      border-color: rgba(14, 165, 233, 0.4);
+      box-shadow: 0 8px 40px rgba(14, 165, 233, 0.12);
+      transform: translateY(-4px);
+    }
+    .project-card:hover::before { opacity: 1; }
+    .project-icon {
+      width: 44px; height: 44px;
+      background: rgba(14, 165, 233, 0.1);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      font-size: 1.25rem;
+    }
+    .project-title {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.6rem;
+    }
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+      flex: 1;
+      margin-bottom: 1.5rem;
+    }
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+    .tech-pill {
+      padding: 0.2rem 0.7rem;
+      background: rgba(14, 165, 233, 0.07);
+      border: 1px solid rgba(14, 165, 233, 0.2);
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--blue-glow);
+      letter-spacing: 0.04em;
+    }
+    .project-links { display: flex; gap: 1rem; }
+    .project-link {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      color: var(--blue);
+      letter-spacing: 0.04em;
+      transition: color var(--transition);
+    }
+    .project-link svg { width: 14px; height: 14px; }
+    .project-link:hover { color: var(--cyan); }
+
+    /* ===== Timeline ===== */
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--blue), transparent);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 2.5rem;
+      padding-left: 2rem;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: 6px;
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 12px rgba(14, 165, 233, 0.7);
+      transform: translateX(-50%);
+    }
+    .timeline-meta {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 0.4rem;
+    }
+    .timeline-date {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--blue);
+      letter-spacing: 0.08em;
+    }
+    .timeline-badge {
+      font-size: 0.72rem;
+      padding: 0.15rem 0.6rem;
+      background: rgba(14, 165, 233, 0.1);
+      border: 1px solid rgba(14, 165, 233, 0.25);
+      border-radius: 100px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+    .timeline-role {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.2rem;
+    }
+    .timeline-company {
+      font-size: 0.88rem;
+      color: var(--blue);
+      margin-bottom: 0.6rem;
+    }
+    .timeline-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .timeline-desc li {
+      list-style: none;
+      padding-left: 1.1em;
+      position: relative;
+      margin-bottom: 0.2rem;
+    }
+    .timeline-desc li::before {
+      content: '▹';
+      position: absolute;
+      left: 0;
+      color: var(--blue);
+    }
+
+    /* ===== Contact ===== */
+    #contact { text-align: center; }
+    .contact-inner {
+      max-width: 540px;
+      margin: 0 auto;
+    }
+    .contact-intro {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+    }
+    .contact-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      color: var(--blue);
+      border: 1.5px solid var(--blue);
+      border-radius: 6px;
+      padding: 0.85rem 2rem;
+      margin-bottom: 2.5rem;
+      transition: all var(--transition);
+    }
+    .contact-email:hover {
+      background: rgba(14, 165, 233, 0.08);
+      box-shadow: 0 0 28px rgba(14, 165, 233, 0.25);
+    }
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      transition: color var(--transition), transform var(--transition);
+    }
+    .social-link svg { width: 20px; height: 20px; }
+    .social-link:hover {
+      color: var(--blue);
+      transform: translateY(-3px);
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem 5%;
+      border-top: 1px solid var(--navy-border);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+    footer span { color: var(--blue); }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-photo-wrap { max-width: 200px; margin: 0 auto; }
+      .projects-grid { grid-template-columns: 1fr; }
+      section { padding: 4rem 5%; }
+    }
+    @media (max-width: 480px) {
+      .hero-cta { flex-direction: column; }
+      .btn-primary, .btn-outline { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Circuit background canvas -->
+  <canvas id="circuit-bg"></canvas>
+
+  <!-- ===== NAV ===== -->
+  <nav id="navbar">
+    <div class="nav-logo">FZ<span>.</span></div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#about" class="mob-link">About</a>
+    <a href="#skills" class="mob-link">Skills</a>
+    <a href="#projects" class="mob-link">Projects</a>
+    <a href="#experience" class="mob-link">Experience</a>
+    <a href="#contact" class="mob-link">Contact</a>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section id="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Hello, world</div>
+      <h1 class="hero-name"><span class="highlight">Fahiz</span></h1>
+      <p class="hero-title">// Electronics Engineer</p>
+      <p class="hero-tagline">
+        Designing circuits that power the future — from low-level embedded firmware to high-speed PCB layouts and FPGA architectures.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn-primary">View Projects</a>
+        <a href="#contact" class="btn-outline">Contact Me</a>
+      </div>
+      <div class="hero-scroll">
+        <div class="scroll-line"></div>
+        SCROLL
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT ===== -->
+  <section id="about">
+    <div class="reveal">
+      <p class="section-label">01 — About</p>
+      <h2 class="section-title">Who I Am</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="about-grid reveal">
+      <div class="about-photo-wrap">
+        <div class="about-photo">
+          <div class="photo-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+          </div>
+          <div class="about-photo-frame"></div>
+          <div class="about-photo-frame-br"></div>
+        </div>
+      </div>
+      <div class="about-content">
+        <p class="about-bio">
+          I'm a passionate <strong>Electronics Engineer</strong> with 5+ years of experience bridging the gap between hardware and software. I specialize in <strong>embedded systems design</strong>, high-speed <strong>PCB layout</strong>, and <strong>FPGA development</strong> — turning complex engineering requirements into elegant, reliable solutions.
+        </p>
+        <p class="about-bio">
+          When I'm not knee-deep in schematics, I enjoy contributing to open-source hardware projects and exploring the intersection of IoT and edge computing. I thrive in fast-paced environments where precision meets creativity.
+        </p>
+        <div class="about-traits">
+          <span class="trait-chip">Detail-Oriented</span>
+          <span class="trait-chip">Problem Solver</span>
+          <span class="trait-chip">Fast Learner</span>
+          <span class="trait-chip">Team Player</span>
+          <span class="trait-chip">Open-Source Advocate</span>
+          <span class="trait-chip">Documentation Nerd</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SKILLS ===== -->
+  <section id="skills">
+    <div class="reveal">
+      <p class="section-label">02 — Skills</p>
+      <h2 class="section-title">Technical Arsenal</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="skills-wrap">
+      <div class="reveal">
+        <p class="skill-category-label">⬡ Hardware Design</p>
+        <div class="skill-tags">
+          <span class="skill-tag">PCB Design</span>
+          <span class="skill-tag">Schematic Capture</span>
+          <span class="skill-tag">High-Speed Layout</span>
+          <span class="skill-tag">Signal Integrity</span>
+          <span class="skill-tag">Power Electronics</span>
+          <span class="skill-tag">RF Circuit Design</span>
+          <span class="skill-tag">Analog Design</span>
+          <span class="skill-tag">Mixed-Signal Systems</span>
+        </div>
+      </div>
+      <div class="reveal">
+        <p class="skill-category-label">⬡ Embedded & FPGA</p>
+        <div class="skill-tags">
+          <span class="skill-tag">Arduino / AVR</span>
+          <span class="skill-tag">STM32 / ARM Cortex</span>
+          <span class="skill-tag">Raspberry Pi</span>
+          <span class="skill-tag">VHDL</span>
+          <span class="skill-tag">Verilog</span>
+          <span class="skill-tag">RTOS (FreeRTOS)</span>
+          <span class="skill-tag">SPI / I2C / UART</span>
+          <span class="skill-tag">CAN Bus</span>
+        </div>
+      </div>
+      <div class="reveal">
+        <p class="skill-category-label">⬡ Simulation & Analysis</p>
+        <div class="skill-tags">
+          <span class="skill-tag">MATLAB / Simulink</span>
+          <span class="skill-tag">LTspice</span>
+          <span class="skill-tag">Circuit Analysis</span>
+          <span class="skill-tag">FFT / Signal Processing</span>
+          <span class="skill-tag">PSpice</span>
+          <span class="skill-tag">Python (numpy/scipy)</span>
+        </div>
+      </div>
+      <div class="reveal">
+        <p class="skill-category-label">⬡ Tools & Proficiency</p>
+        <div class="skill-bars">
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span>Altium Designer</span><span>90%</span></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill" data-width="90"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span>KiCad</span><span>85%</span></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill" data-width="85"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span>MATLAB</span><span>80%</span></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill" data-width="80"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span>C / C++ (Embedded)</span><span>88%</span></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill" data-width="88"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span>Xilinx Vivado (VHDL)</span><span>75%</span></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill" data-width="75"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROJECTS ===== -->
+  <section id="projects">
+    <div class="reveal">
+      <p class="section-label">03 — Projects</p>
+      <h2 class="section-title">Featured Work</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <div class="project-icon">⚡</div>
+        <h3 class="project-title">Autonomous Solar MPPT Controller</h3>
+        <p class="project-desc">
+          Designed and fabricated a 4-layer PCB for a 200W solar Maximum Power Point Tracking controller. Implemented perturb-and-observe algorithm on STM32F4 with 97.8% efficiency under variable load conditions.
+        </p>
+        <div class="project-tech">
+          <span class="tech-pill">STM32F4</span>
+          <span class="tech-pill">Altium</span>
+          <span class="tech-pill">C/C++</span>
+          <span class="tech-pill">LTspice</span>
+          <span class="tech-pill">SMPS Design</span>
+        </div>
+        <div class="project-links">
+          <a href="#" class="project-link">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.1 3.29 9.43 7.86 10.96.57.1.78-.25.78-.55v-1.92c-3.19.69-3.86-1.54-3.86-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.27-5.23-5.67 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.03 0 0 .96-.31 3.15 1.17.91-.25 1.89-.38 2.86-.38.97 0 1.95.13 2.86.38 2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.38-5.25 5.66.41.36.78 1.06.78 2.14v3.17c0 .31.2.66.79.55C20.21 21.43 23.5 17.1 23.5 12 23.5 5.73 18.27.5 12 .5z"/></svg>
+            GitHub
+          </a>
+          <a href="#" class="project-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Live Demo
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-icon">📡</div>
+        <h3 class="project-title">FPGA-Based UART Protocol Analyzer</h3>
+        <p class="project-desc">
+          Built a real-time UART protocol analyzer on a Xilinx Artix-7 FPGA using VHDL. Features baud rate auto-detection up to 3 Mbps, parity checking, and VGA output for live waveform display.
+        </p>
+        <div class="project-tech">
+          <span class="tech-pill">VHDL</span>
+          <span class="tech-pill">Xilinx Artix-7</span>
+          <span class="tech-pill">Vivado</span>
+          <span class="tech-pill">VGA Controller</span>
+        </div>
+        <div class="project-links">
+          <a href="#" class="project-link">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.1 3.29 9.43 7.86 10.96.57.1.78-.25.78-.55v-1.92c-3.19.69-3.86-1.54-3.86-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.27-5.23-5.67 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.03 0 0 .96-.31 3.15 1.17.91-.25 1.89-.38 2.86-.38.97 0 1.95.13 2.86.38 2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.38-5.25 5.66.41.36.78 1.06.78 2.14v3.17c0 .31.2.66.79.55C20.21 21.43 23.5 17.1 23.5 12 23.5 5.73 18.27.5 12 .5z"/></svg>
+            GitHub
+          </a>
+          <a href="#" class="project-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Docs
+          </a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-icon">🌐</div>
+        <h3 class="project-title">Wireless Sensor Network Node</h3>
+        <p class="project-desc">
+          Developed an ultra-low-power IoT sensor node (avg. 12μA sleep current) based on Nordic nRF52840. Custom 2-layer PCB with integrated BLE, temperature/humidity, and 2-year battery life on a CR2032.
+        </p>
+        <div class="project-tech">
+          <span class="tech-pill">nRF52840</span>
+          <span class="tech-pill">BLE 5.2</span>
+          <span class="tech-pill">KiCad</span>
+          <span class="tech-pill">Zephyr RTOS</span>
+          <span class="tech-pill">C</span>
+        </div>
+        <div class="project-links">
+          <a href="#" class="project-link">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.1 3.29 9.43 7.86 10.96.57.1.78-.25.78-.55v-1.92c-3.19.69-3.86-1.54-3.86-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.27-5.23-5.67 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.03 0 0 .96-.31 3.15 1.17.91-.25 1.89-.38 2.86-.38.97 0 1.95.13 2.86.38 2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.38-5.25 5.66.41.36.78 1.06.78 2.14v3.17c0 .31.2.66.79.55C20.21 21.43 23.5 17.1 23.5 12 23.5 5.73 18.27.5 12 .5z"/></svg>
+            GitHub
+          </a>
+          <a href="#" class="project-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Case Study
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== EXPERIENCE & EDUCATION ===== -->
+  <section id="experience">
+    <div class="reveal">
+      <p class="section-label">04 — Experience & Education</p>
+      <h2 class="section-title">My Journey</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-meta">
+          <span class="timeline-date">2022 — Present</span>
+          <span class="timeline-badge">Full-time</span>
+        </div>
+        <div class="timeline-role">Hardware Design Engineer</div>
+        <div class="timeline-company">NovaTech Semiconductor · San Francisco, CA</div>
+        <ul class="timeline-desc">
+          <li>Lead PCB design for a next-gen industrial IoT gateway (6-layer, 10Gbps Ethernet)</li>
+          <li>Reduced BOM cost by 18% through component standardization and supplier negotiation</li>
+          <li>Mentored 3 junior engineers in high-speed layout best practices and SI analysis</li>
+        </ul>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-meta">
+          <span class="timeline-date">2020 — 2022</span>
+          <span class="timeline-badge">Full-time</span>
+        </div>
+        <div class="timeline-role">Embedded Systems Engineer</div>
+        <div class="timeline-company">SparqDynamics · Austin, TX</div>
+        <ul class="timeline-desc">
+          <li>Developed FreeRTOS firmware for STM32-based motor control units in EV chargers</li>
+          <li>Designed and validated custom power supply modules meeting IEC 62368-1</li>
+          <li>Achieved UL and CE certification for 3 product lines ahead of schedule</li>
+        </ul>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-meta">
+          <span class="timeline-date">2019 — 2020</span>
+          <span class="timeline-badge">Internship</span>
+        </div>
+        <div class="timeline-role">Hardware Engineering Intern</div>
+        <div class="timeline-company">Infineon Technologies · Munich, Germany</div>
+        <ul class="timeline-desc">
+          <li>Assisted in validation testing for GaN power switching ICs</li>
+          <li>Automated test report generation using Python, saving 6 hrs/week</li>
+        </ul>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-meta">
+          <span class="timeline-date">2015 — 2019</span>
+          <span class="timeline-badge">Education</span>
+        </div>
+        <div class="timeline-role">B.Eng. Electrical & Electronic Engineering</div>
+        <div class="timeline-company">University of California, Berkeley</div>
+        <ul class="timeline-desc">
+          <li>GPA: 3.82 / 4.0 — Graduated with Honors</li>
+          <li>Senior Thesis: "Adaptive Noise Cancellation for Biomedical Wearables"</li>
+          <li>IEEE Student Branch President (2018–2019)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section id="contact">
+    <div class="reveal">
+      <p class="section-label">05 — Contact</p>
+      <h2 class="section-title">Let's Build Together</h2>
+      <div class="section-divider" style="margin: 0 auto 3rem;"></div>
+    </div>
+    <div class="contact-inner reveal">
+      <p class="contact-intro">
+        I'm open to freelance projects, full-time roles, and interesting collaborations. Whether you have a hardware challenge or just want to geek out about circuits — my inbox is always open.
+      </p>
+      <a href="mailto:fahiz@email.com" class="contact-email">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        fahiz@email.com
+      </a>
+      <div class="social-links">
+        <a href="#" class="social-link" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+        <a href="#" class="social-link" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.1 3.29 9.43 7.86 10.96.57.1.78-.25.78-.55v-1.92c-3.19.69-3.86-1.54-3.86-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.27-5.23-5.67 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.03 0 0 .96-.31 3.15 1.17.91-.25 1.89-.38 2.86-.38.97 0 1.95.13 2.86.38 2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.38-5.25 5.66.41.36.78 1.06.78 2.14v3.17c0 .31.2.66.79.55C20.21 21.43 23.5 17.1 23.5 12 23.5 5.73 18.27.5 12 .5z"/></svg>
+          GitHub
+        </a>
+        <a href="#" class="social-link" aria-label="Twitter">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+          Twitter
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <p>Designed & Built by <span>Fahiz</span> &nbsp;·&nbsp; &copy; 2025</p>
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    /* ---- Circuit Board Canvas ---- */
+    (function() {
+      const canvas = document.getElementById('circuit-bg');
+      const ctx = canvas.getContext('2d');
+      let nodes = [];
+      const NODE_COUNT = 40;
+      const COLOR = '#0ea5e9';
+
+      function resize() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', () => { resize(); buildNodes(); });
+      resize();
+
+      function buildNodes() {
+        nodes = [];
+        const cols = Math.ceil(canvas.width  / 80);
+        const rows = Math.ceil(canvas.height / 80);
+        for (let c = 0; c <= cols; c++) {
+          for (let r = 0; r <= rows; r++) {
+            if (Math.random() > 0.55) continue;
+            nodes.push({
+              x: c * 80 + (Math.random() - 0.5) * 30,
+              y: r * 80 + (Math.random() - 0.5) * 30,
+              pulse: Math.random(),
+              speed: 0.005 + Math.random() * 0.01
+            });
+          }
+        }
+      }
+      buildNodes();
+
+      function drawCircuit() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Draw lines between nearby nodes
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const dx = nodes[j].x - nodes[i].x;
+            const dy = nodes[j].y - nodes[i].y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 130) {
+              // Right-angle path
+              ctx.beginPath();
+              ctx.moveTo(nodes[i].x, nodes[i].y);
+              if (Math.random() > 0.5) {
+                ctx.lineTo(nodes[j].x, nodes[i].y);
+                ctx.lineTo(nodes[j].x, nodes[j].y);
+              } else {
+                ctx.lineTo(nodes[i].x, nodes[j].y);
+                ctx.lineTo(nodes[j].x, nodes[j].y);
+              }
+              ctx.strokeStyle = COLOR;
+              ctx.lineWidth   = 0.5;
+              ctx.globalAlpha = 0.25 * (1 - dist / 130);
+              ctx.stroke();
+              ctx.globalAlpha = 1;
+            }
+          }
+        }
+        // Draw nodes
+        nodes.forEach(n => {
+          n.pulse = (n.pulse + n.speed) % 1;
+          const alpha = 0.3 + 0.5 * Math.sin(n.pulse * Math.PI * 2);
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = COLOR;
+          ctx.globalAlpha = alpha;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        });
+      }
+
+      let lastRedraw = 0;
+      function loop(t) {
+        if (t - lastRedraw > 80) { drawCircuit(); lastRedraw = t; }
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    })();
+
+    /* ---- Navbar scroll shadow ---- */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 30);
+    });
+
+    /* ---- Hamburger ---- */
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+    document.querySelectorAll('.mob-link').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+      });
+    });
+
+    /* ---- Scroll Reveal ---- */
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => {
+            e.target.classList.add('visible');
+          }, 80);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+
+    /* ---- Skill Bar Animation ---- */
+    const barObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.skill-bar-fill').forEach(fill => {
+            const w = fill.getAttribute('data-width');
+            setTimeout(() => { fill.style.width = w + '%'; }, 200);
+          });
+          barObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.skill-bars').forEach(el => barObserver.observe(el));
+
+    /* ---- Active nav link on scroll ---- */
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) cur = s.id;
+      });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === '#' + cur ? 'var(--white)' : '';
+      });
+    });
+  </script>
+</body>
+</html>
